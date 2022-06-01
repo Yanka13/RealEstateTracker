@@ -28,7 +28,7 @@ def neighborhood(df):
     # cleaning neighborhood
     new = df["ndirty"].str.split(" en ", n = 1, expand = True)
     df["neighborhood"] = new[1]
-    df["neighborhood"] = df["neighborhood"].apply(lambda x: x.split(",")[-1])
+    df["neighborhood"] = df["neighborhood"].apply(lambda x: x.split(", ")[-1])
     df = df.drop(columns="ndirty")
     return df
 

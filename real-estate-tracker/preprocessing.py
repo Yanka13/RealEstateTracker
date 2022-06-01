@@ -1,10 +1,6 @@
 import pandas as pd
 import numpy as np
 
-# preprocessing functions
-
-df = pd.read_csv("../raw_data/real_estate_data.csv",index_col="Unnamed: 0").drop(columns="Unnamed: 0.1")
-df = df.drop(columns=["elevator","heating","floor"])
 
 def surface(df):
     # dropping nulls
@@ -57,7 +53,10 @@ def rooms(df):
     df_clean = df
     return df_clean
 
-def preprocess(df):
+def preprocess():
+    # Returns a fully preprocessed data frame. Data should be in the raw_data folder.
+    df = pd.read_csv("../raw_data/real_estate_data.csv",index_col="Unnamed: 0").drop(columns="Unnamed: 0.1")
+    df = df.drop(columns=["elevator","heating","floor"])
     df = surface(df)
     df = neighborhood(df)
     df = price(df)

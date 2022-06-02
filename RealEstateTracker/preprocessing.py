@@ -61,4 +61,4 @@ def preprocess():
     df = neighborhood(df)
     df = price(df)
     df = rooms(df)
-    return df.drop_duplicates()
+    return df.drop_duplicates().reset_index(drop = True)

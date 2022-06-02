@@ -67,6 +67,7 @@ def preprocess():
     df = neighborhood(df)
     df = price(df)
     df = rooms(df)
+<<<<<<< HEAD
     return df.drop_duplicates()
 
 def X_y(df):
@@ -118,3 +119,6 @@ def customCrossValidation( model , X , y , cv = 5 , shuffle = True):
     #cv = customCrossValidation( model , X_train , y_train , cv = 5 )
    #score = cv["test_score"].mean()
     #print(score)
+=======
+    return df.drop_duplicates().reset_index(drop = True)
+>>>>>>> 0f5bbd3bf8c4504030665a955ab649c06636472e

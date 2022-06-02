@@ -1,6 +1,12 @@
 import pandas as pd
 import numpy as np
-
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import RobustScaler
+from sklearn.compose import make_column_transformer
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_squared_log_error
 
 def surface(df):
     # dropping nulls
@@ -62,3 +68,53 @@ def preprocess():
     df = price(df)
     df = rooms(df)
     return df.drop_duplicates()
+
+def X_y(df):
+    X = df.drop(columns="price")
+    y = df[['price']]
+    return X,y
+
+def split(X,y, test_size = 0.3):
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=test_size)
+    return X_train, X_test, y_train, y_test
+
+def pipeline(X_train,X_test):
+    # num transformer
+    num_transformer = make_pipeline(RobustScaler())
+
+    # cat transformer
+    cat_transformer = make_pipeline(OneHotEncoder(handle_unknown="ignore",
+                                                sparse = False))
+
+    # Preproc basic
+    preproc_basic = make_column_transformer((num_transformer, ['rooms','surface']),
+                                            (cat_transformer,['neighborhood','nhousetype']))
+    X_train = preproc_basic.fit_transform(X_train)
+    X_test = preproc_basic.transform(X_test)
+    return X_train,X_test
+
+def customCrossValidation( model , X , y , cv = 5 , shuffle = True):
+    scores = []
+    kf = KFold(n_splits = cv , shuffle = True)
+
+    if isinstance(y , pd.DataFrame):
+        y = y.to_numpy()
+
+    if isinstance(X , pd.DataFrame):
+        X = X.to_numpy()
+
+
+    for train_index , test_index in kf.split(X):
+        print("TRAIN:", len(train_index), "TEST:", len(test_index))
+        X_train , X_test = X[train_index] , X[test_index]
+        y_train , y_test = np.log(y[train_index]) , y[test_index]
+        model.fit(X_train , y_train)
+        prediction = np.exp(model.predict(X_test))
+        error = mean_squared_log_error(y_test , prediction)
+        scores.append(error)
+    return {"test_score" : np.array(scores) }
+
+#or _ in range(20):
+    #cv = customCrossValidation( model , X_train , y_train , cv = 5 )
+   #score = cv["test_score"].mean()
+    #print(score)

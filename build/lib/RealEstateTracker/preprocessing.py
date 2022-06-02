@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 
+# preprocessing functions
+
+#df = pd.read_csv("../raw_data/real_estate_data.csv",index_col="Unnamed: 0").drop(columns="Unnamed: 0.1")
+#df = df.drop(columns=["elevator","heating","floor"])
 
 def surface(df):
     # dropping nulls
@@ -28,7 +32,7 @@ def neighborhood(df):
     # cleaning neighborhood
     new = df["ndirty"].str.split(" en ", n = 1, expand = True)
     df["neighborhood"] = new[1]
-    df["neighborhood"] = df["neighborhood"].apply(lambda x: x.split(", ")[-1])
+    df["neighborhood"] = df["neighborhood"].apply(lambda x: x.split(",")[-1])
     df = df.drop(columns="ndirty")
     return df
 
@@ -53,12 +57,9 @@ def rooms(df):
     df_clean = df
     return df_clean
 
-def preprocess():
-    # Returns a fully preprocessed data frame. Data should be in the raw_data folder.
-    df = pd.read_csv("../raw_data/real_estate_data.csv",index_col="Unnamed: 0").drop(columns="Unnamed: 0.1")
-    df = df.drop(columns=["elevator","heating","floor"])
+def preprocess(df):
     df = surface(df)
     df = neighborhood(df)
     df = price(df)
     df = rooms(df)
-    return df.drop_duplicates()
+    return df

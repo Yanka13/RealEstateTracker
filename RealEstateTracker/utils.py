@@ -19,5 +19,6 @@ def save_model(model):
 #     print(f"uploaded model.joblib to gcp cloud storage under \n => {self.STORAGE_LOCATION}")
 
 def load_model(model):
+    """ Loads the trained model from a joblib file in the specified path """
     print(f"Model loaded from path {model}")
     return joblib.load(model)

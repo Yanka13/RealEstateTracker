@@ -31,3 +31,4 @@ termcolor
 folium
 streamlit_folium
 requests
+xgboost

@@ -143,7 +143,7 @@ param = pd.DataFrame(param, index=[0]).rename(columns={"pick_rooms":"rooms",
                                                 "neighborhood": "neighborhood",
                                                 "type": "nhousetype"})
 
-potato = joblib.load("../RealEstateTracker/model.joblib")
+potato = joblib.load("../model.joblib")
 pred = round(potato.predict(param)[0], 0)
 
 final_pred = f"With the given characteristics, the market price is between {pred * 0.95} and {pred * 1.05}"

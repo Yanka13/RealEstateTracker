@@ -1,3 +1,4 @@
+from math import remainder
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -7,6 +8,7 @@ from sklearn.compose import make_column_transformer
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_log_error
+from xgboost import XGBRegressor
 
 def surface(df):
     # dropping nulls
@@ -67,32 +69,33 @@ def preprocess():
     df = neighborhood(df)
     df = price(df)
     df = rooms(df)
-    return df.drop_duplicates()
+    return df.drop_duplicates().reset_index(drop = True)
 
 def X_y(df):
     X = df.drop(columns="price")
     y = df[['price']]
     return X,y
 
-def split(X,y, test_size = 0.3):
+def split(X,y, test_size = 0.2):
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=test_size)
     return X_train, X_test, y_train, y_test
 
-def pipeline(X_train,X_test):
-    # num transformer
-    num_transformer = make_pipeline(RobustScaler())
 
-    # cat transformer
-    cat_transformer = make_pipeline(OneHotEncoder(handle_unknown="ignore",
-                                                sparse = False))
 
-    # Preproc basic
-    preproc_basic = make_column_transformer((num_transformer, ['rooms','surface']),
-                                            (cat_transformer,['neighborhood','nhousetype']))
-    X_train = preproc_basic.fit_transform(X_train)
-    X_test = preproc_basic.transform(X_test)
-    return X_train,X_test
 
+### Preproc pipeline and model
+# Preproc basic
+preproc_basic = make_column_transformer((RobustScaler(), ['rooms','surface']),
+                                        (OneHotEncoder(handle_unknown="ignore", sparse = False),['neighborhood','nhousetype']),
+                                        remainder="passthrough")
+# XGBregressor model
+model_basic = make_pipeline(preproc_basic, XGBRegressor())
+
+
+
+
+
+### Cross validation function
 def customCrossValidation( model , X , y , cv = 5 , shuffle = True):
     scores = []
     kf = KFold(n_splits = cv , shuffle = True)
@@ -114,6 +117,8 @@ def customCrossValidation( model , X , y , cv = 5 , shuffle = True):
         scores.append(error)
     return {"test_score" : np.array(scores) }
 
+
+### Use crossvall function:
 #or _ in range(20):
     #cv = customCrossValidation( model , X_train , y_train , cv = 5 )
    #score = cv["test_score"].mean()
